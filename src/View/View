@@ -1,1 +1,163 @@
+package View;
+
+import java.util.ArrayList;
+import java.util.Scanner;
+
+
+import Controller.DataController;
+import Model.Book;
+import Model.BookReaderManagement;
+import Model.Reader;
+
+public class View {
+	public static void main(String[] args) {
+		int idbook = 100000;
+		int idreader = 10000000;
+		int choice = 0;
+		
+		var booksFileName = "BOOK.DAT";
+		var readersFileName = "READER.DAT";
+		var BRMFileName = "BRM.DAT";
+		
+		var books = new ArrayList<Book>();
+		var readers = new ArrayList<Reader>();
+		Scanner scanner = new Scanner(System.in);
+		do {
+			System.out.println("Menu:");
+			System.out.println("1.Add a new book to file");
+			System.out.println("2.Display the list of book in file");
+			System.out.println("3.Add a new reader to file");
+			System.out.println("4.Display the list of reader in file");
+			System.out.println("5.Add a new book-reader management in file");
+			System.out.println("0.Thoat khoi ung dung");
+			System.out.println("Your choise is:");
+			
+			choice = scanner.nextInt();
+			scanner.nextLine();
+			
+			switch(choice) {
+			case 0: System.out.println("Good bye"); break;
+			
+			case 1: 
+			String[] specs = {"Science", "Art", "Economic", "IT"};
+			String bookName, author, spec;
+			int year, quantity, spofbook;
+			
+			System.out.println("Enter the name of the book: ");
+			bookName = scanner.nextLine();
+			
+			System.out.println("Enter the author of the book: ");
+		    author = scanner.nextLine();
+		    
+		    do {
+		    System.out.println("Enter the specialization of the book: ");
+		    System.out.println("1.Science \n2.Art \n3.Economic \n4.IT");
+		    spofbook = scanner.nextInt();
+		    } while (spofbook < 1 || spofbook > 4);
+		    
+		    spec = specs[spofbook - 1];
+		    
+		    System.out.println("Enter the publish year: ");
+		    year = scanner.nextInt();
+		    
+		    System.out.println("Enter the quantity: ");
+		    quantity = scanner.nextInt();
+		    
+			Book book = new Book(idbook, bookName, author, spec, year, quantity);
+			
+			idbook ++;
+			
+			DataController.writeBookToFile(book, booksFileName);
+			break;
+			
+			case 2: 
+				books = DataController.readBooksFromFile(booksFileName);
+				displayListBooks(books); break;
+			
+			case 3: 
+				String fullName, address, phoneNumber;
+				
+		        System.out.println("Enter the reader's name: ");
+		        fullName = scanner.nextLine();
+		        
+		        System.out.println("Enter the reader's address: ");
+		        address = scanner.nextLine();
+		        
+		        System.out.println("Enter the reader's phoneNumber: ");
+		        phoneNumber = scanner.nextLine();
+		        
+		        Reader reader = new Reader(idreader, fullName, address, phoneNumber);
+		        
+		        idreader ++;
+		        
+		        DataController.writeReaderToFile(reader, readersFileName);
+		        break;
+		        
+			case 4:
+				readers = DataController.readReadersFromFile(readersFileName);
+				displayListReaders(readers); break;
+				
+			case 5: 
+				readers = DataController.readReadersFromFile(readersFileName);
+				displayListReaders(readers);
+				System.out.println("The ID of the reader you want is: ");
+						
+				int IdReader = scanner.nextInt();
+				
+				Reader readerborrow = new Reader(IdReader);
+				
+				for (int i = 0; i< readers.size() ; i++) {
+					reader = readers.get(i);
+					if (reader.getReaderID() == IdReader ) {
+						System.out.println("The reader who wants to borrow book is: " +reader.getFullName());
+					}
+				} 
+				
+				System.out.println("Enter the name of book borrowed: ");
+				
+				books = DataController.readBooksFromFile(booksFileName);
+				displayListBooks(books);
+				
+				System.out.println("The ID of the book borrowed is: ");
+				int IdBook = scanner.nextInt();
+				
+				Book bookborrowed = new Book(IdBook);
+				
+				for (int i = 0; i< readers.size() ; i++) {
+					book = books.get(i);
+					if (book.getBookID() == IdBook ) { 
+
+					System.out.println("The book borrowed is: " +book.getBookName());
+				  } 
+				}
+				
+				System.out.println("Enter the number of borrow: ");
+				int numofBorrow = scanner.nextInt();
+				
+				scanner.nextLine();
+				
+				System.out.println("Enter the state of the book:");
+				String state = scanner.nextLine();
+				
+				BookReaderManagement brm = new BookReaderManagement(readerborrow, bookborrowed, numofBorrow, state);
+				
+				DataController.writeBRMToFile(brm, BRMFileName);
+				break;
+				
+			}
+		} while (choice != 0);
+	}		    	
+
+	private static void displayListReaders(ArrayList<Reader> readers) {
+		System.out.println("The list of readers in file: ");
+		for(var r: readers) 
+			System.out.println(r);
+	}
+
+	private static void displayListBooks(ArrayList<Book> books) {
+		    System.out.println("The list of books in file: ");
+		    for(var b: books)
+		    System.out.println(b);
+		}
+}
 
